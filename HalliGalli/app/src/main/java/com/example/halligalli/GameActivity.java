@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,10 +24,21 @@ public class GameActivity extends AppCompatActivity {
     private boolean isBlinking = false; // 깜박임 애니메이션 상태 확인
 
 
+    // 뒤로가기 버튼이 먹히지 않도록 하는 코드입니다.
+    private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 
         // Intent로 전달된 데이터 수신
         Intent intent = getIntent();
@@ -90,7 +102,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void updateTimerView() {
         // 초 단위로 UI 업데이트
-        gameTimerView.setText(String.valueOf(turnTimeLeft) + "초");
+        gameTimerView.setText(getString(R.string.timer_text, turnTimeLeft));
     }
 
     private void triggerBlinkEffect() {
@@ -101,7 +113,7 @@ public class GameActivity extends AppCompatActivity {
         animator.start();
 
         // 3초 후 애니메이션 종료
-        timerHandler.postDelayed(() -> animator.cancel(), 3000);
+        timerHandler.postDelayed(animator::cancel, 3000);
     }
 
     private void endTurn() {
@@ -116,8 +128,8 @@ public class GameActivity extends AppCompatActivity {
     // 확인 대화상자 표시
     private void showExitConfirmationDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("게임 종료")
-                .setMessage("게임을 종료하고 로비로 돌아가시겠습니까?")
+                .setTitle(getText(R.string.game_end_title))
+                .setMessage(getText(R.string.game_end_description))
                 .setPositiveButton("예", (dialog, which) -> navigateToLobby())
                 .setNegativeButton("아니오", (dialog, which) -> dialog.dismiss())
                 .show();
@@ -125,8 +137,13 @@ public class GameActivity extends AppCompatActivity {
 
     // 로비로 이동
     private void navigateToLobby() {
-        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        Intent intent = new Intent(GameActivity.this, LobbyActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // 기존 액티비티 스택 제거
         startActivity(intent);
     }
+
+
+
+
+
 }

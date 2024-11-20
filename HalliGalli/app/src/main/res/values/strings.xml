@@ -5,4 +5,8 @@
         <item>보통</item>
         <item>어려움</item>
     </string-array>
+    <string name="game_end_title">게임 종료</string>
+    <string name="game_end_description">게임을 종료하고 로비로 돌아가시겠습니까?</string>
+
+    <string name="timer_text">%d초</string>
 </resources>
