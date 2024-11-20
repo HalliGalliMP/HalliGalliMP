@@ -1,0 +1,179 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <!-- 상대방 정보 -->
+    <LinearLayout
+        android:id="@+id/opponentInfo"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp">
+
+        <!-- 상대방 이름 -->
+        <TextView
+            android:id="@+id/opponentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="상대"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <!-- 상대방 레벨 및 카드 정보 -->
+        <TextView
+            android:id="@+id/opponentInfoDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Level: 1 | Total Cards: 123"
+            android:textSize="14sp"
+            android:textColor="#666666" />
+    </LinearLayout>
+
+    <!-- 중앙 타이머 -->
+    <TextView
+        android:id="@+id/gameTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/opponentInfo"
+        android:layout_marginStart="80dp"
+        android:text="00:00"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:textColor="#FF0000" />
+
+    <!-- 카드와 벨 영역 -->
+
+    <ImageView
+        android:id="@+id/oppoentDeck"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_above="@+id/linearLayout"
+        android:layout_marginStart="22dp"
+        android:layout_marginBottom="47dp"
+        android:src="@drawable/card_deck"
+        android:contentDescription="" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- 상대방 카드 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/opponentCardCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="32"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/opponentCard"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:contentDescription="Opponent Card" />
+        </LinearLayout>
+
+        <!-- 벨 -->
+        <ImageView
+            android:id="@+id/gameBell"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Game Bell"
+            android:src="@drawable/halligalli_bell" />
+
+        <!-- 플레이어 카드 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/playerCard"
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="Player Card" />
+
+            <TextView
+                android:id="@+id/playerCardCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="32"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <!-- 플레이어 정보 -->
+
+    <ImageView
+        android:id="@+id/playertDeck"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/linearLayout"
+        android:layout_marginStart="257dp"
+        android:layout_marginTop="47dp"
+        android:src="@drawable/card_deck"/>
+
+    <LinearLayout
+        android:id="@+id/playerInfo"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp">
+
+        <!-- 플레이어 이름 -->
+        <TextView
+            android:id="@+id/playerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="나"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <!-- 플레이어 레벨 및 카드 정보 -->
+        <TextView
+            android:id="@+id/playerInfoDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Level: 1 | Total Cards: 123"
+            android:textSize="14sp"
+            android:textColor="#666666" />
+    </LinearLayout>
+
+    <!-- 로비로 돌아가는 버튼 -->
+    <Button
+        android:id="@+id/backToLobbyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="10dp"
+        android:text="로비로 돌아가기" />
+</RelativeLayout>
