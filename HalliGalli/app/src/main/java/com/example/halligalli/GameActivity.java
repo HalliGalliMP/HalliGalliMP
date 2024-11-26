@@ -31,7 +31,7 @@ public class GameActivity extends AppCompatActivity {
     private TextView playerNameView;
 
     private Handler gameHandler = new Handler();
-    private int turnTimeLeft = 9; // 9초 제한시간
+    private int turnTimeLeft = 4; // 9초 제한시간
     private boolean isBlinking = false; // 깜박임 애니메이션 상태 확인
 
     private List<String> playerDeck = new ArrayList<>();
@@ -197,7 +197,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startTurnTimer() {
-        turnTimeLeft = 9;
+        turnTimeLeft = 4;
         isCardPlayed = false;
         isBlinking = false; // 새로운 턴에서 깜박임 초기화
         updateTimerView();
@@ -292,7 +292,7 @@ public class GameActivity extends AppCompatActivity {
     private void endTurn() {// 턴 자동으로 넘기는 거 구현해야함
         isPlayerTurn= !isPlayerTurn; //
         isCardPlayed = false;// 턴 교체
-        turnTimeLeft = 9; // 타이머 초기화
+        turnTimeLeft = 4; // 타이머 초기화
         if (!isPlayerTurn) {
             // AI 턴에서 1초 후 카드 제출
             gameHandler.postDelayed(() -> {
