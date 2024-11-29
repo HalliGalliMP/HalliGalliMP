@@ -200,4 +200,15 @@
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="10dp"
         android:text="로비로 돌아가기" />
+
+    <TextView
+        android:id="@+id/turnIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="24sp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/black"
+        android:padding="16dp"
+        android:visibility="gone" />
 </RelativeLayout>
