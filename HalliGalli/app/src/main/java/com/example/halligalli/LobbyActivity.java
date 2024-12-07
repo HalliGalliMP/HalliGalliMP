@@ -38,14 +38,10 @@ public class LobbyActivity extends AppCompatActivity {
     // 싱글 게임 버튼 리스너
     private final View.OnClickListener singleGameClickListener = v -> {
         //플레이어 이름가져오기
-        String playerName = playerNameInput.getText().toString().trim();
+        String playerName = "Player 1";
         // 난이도 값 가져오기
         String selectedDifficulty = difficultySpinner.getSelectedItem().toString();
-        // 플레이어 이름 확인
-        if (playerName.isEmpty()) {
-            Toast.makeText(this, "플레이어 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+
 
         // GameActivity로 전환
         Intent intent = new Intent(LobbyActivity.this, GameActivity.class);

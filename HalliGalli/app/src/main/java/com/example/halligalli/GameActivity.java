@@ -1,5 +1,7 @@
 package com.example.halligalli;
 
+
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -25,7 +27,10 @@ import java.util.Map;
 import java.util.Random;
 
 
+
 public class GameActivity extends AppCompatActivity {
+    public static final int TURN_TIME = 3;
+
     private String mode; // 싱글 or 멀티
     private String difficulty; // 쉬움, 보통, 어려움
     private TextView gameTimerView, playerCardCountView, opponentCardCountView,
@@ -34,7 +39,7 @@ public class GameActivity extends AppCompatActivity {
     private TextView playerNameView;
 
     private Handler gameHandler = new Handler();
-    private int turnTimeLeft = 6; // 9초 제한시간
+    private int turnTimeLeft = 3; // 9초 제한시간
     private boolean isBlinking = false; // 깜박임 애니메이션 상태 확인
 
     private List<String> playerDeck = new ArrayList<>();
@@ -53,7 +58,7 @@ public class GameActivity extends AppCompatActivity {
     private Random random = new Random();
 
     // 난이도 관련 변수 초기화
-    private int[] aiCardPlayDelayRange = {5000, 6000};
+    private int[] aiCardPlayDelayRange = {2500, 3500};
     private int[] aiReactionTimeRange = {1000, 3000};
     private int aiMistakeProbability = 50;
 
@@ -224,6 +229,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         updateCardCounts();
+        updateTimerView();
     }
 
     private void createCards(List<String> deck, String fruit) {
@@ -253,7 +259,7 @@ public class GameActivity extends AppCompatActivity {
     private void startTurnTimer() {
 
         gameHandler.removeCallbacksAndMessages(null);
-        turnTimeLeft = 6;
+        turnTimeLeft = TURN_TIME;
         isCardPlayed = false;
         updateTimerView();
 
@@ -272,9 +278,11 @@ public class GameActivity extends AppCompatActivity {
                             if (isPlayerTurn) {
 
                                 isPlayerTurn = false;
+                                updateTimerView();
                                 drawPlayerCard();
 
                         } else {
+                                updateTimerView();
                             drawOpponentCard();
                         }
                     }
@@ -285,17 +293,24 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void updateTimerView() {
+        if(isPlayerTurn)
+        {
+            gameTimerView.setVisibility(View.VISIBLE);
+        }
+        else{
+            gameTimerView.setVisibility(View.GONE);
+        }
         gameTimerView.setText(getString(R.string.timer_text, turnTimeLeft));
     }
 
-    private void triggerBlinkEffect() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(gameTimerView, "alpha", 1f, 0f, 1f);
-        animator.setDuration(300);
-        animator.setRepeatCount(ObjectAnimator.INFINITE);
-        animator.start();
-
-        gameHandler.postDelayed(animator::cancel, 3000); // 3초 후 애니메이션 종료
-    }
+//    private void triggerBlinkEffect() {
+//        ObjectAnimator animator = ObjectAnimator.ofFloat(gameTimerView, "alpha", 1f, 0f, 1f);
+//        animator.setDuration(300);
+//        animator.setRepeatCount(ObjectAnimator.INFINITE);
+//        animator.start();
+//
+//        gameHandler.postDelayed(animator::cancel, 3000); // 3초 후 애니메이션 종료
+//    }
 
     private void drawPlayerCard() {
         if (!playerDeck.isEmpty()) {
@@ -315,6 +330,8 @@ public class GameActivity extends AppCompatActivity {
             if (isHalliGalliRuleMet()) {
                 gameBellPressed(true); // 플레이어의 즉시 "할리갈리" 처리
             }
+
+
 
             endTurn(); // 턴 종료
         } else {
@@ -377,10 +394,13 @@ public class GameActivity extends AppCompatActivity {
         // 턴 교체
         if (!playerDeck.isEmpty() && !opponentDeck.isEmpty()) {
             isPlayerTurn = !isPlayerTurn;
+            updateTimerView();
         } else if (playerDeck.isEmpty()) {
             isPlayerTurn = false; // 상대방만 카드 낼 수 있음
+            updateTimerView();
         } else if (opponentDeck.isEmpty()) {
             isPlayerTurn = true; // 플레이어만 카드 낼 수 있음
+            updateTimerView();
         }
 
         isCardPlayed = false; // 카드 제출 상태 초기화
@@ -390,10 +410,10 @@ public class GameActivity extends AppCompatActivity {
 
         if (!isPlayerTurn && !opponentDeck.isEmpty()) {
             // AI 턴: 애니메이션 후 카드 제출
-            gameHandler.postDelayed(this::drawOpponentCard, 2000);
+            gameHandler.postDelayed(this::drawOpponentCard, 0);
         } else if (isPlayerTurn && !playerDeck.isEmpty()) {
             // 플레이어 턴: 애니메이션 후 타이머 시작
-            gameHandler.postDelayed(this::startTurnTimer, 2000);
+            gameHandler.postDelayed(this::startTurnTimer, 0);
         }
     }
 
