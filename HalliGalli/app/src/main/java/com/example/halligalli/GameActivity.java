@@ -8,7 +8,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -40,12 +39,11 @@ public class GameActivity extends AppCompatActivity {
 
     private Handler gameHandler = new Handler();
     private int turnTimeLeft = 3; // 9초 제한시간
-    private boolean isBlinking = false; // 깜박임 애니메이션 상태 확인
 
-    private List<String> playerDeck = new ArrayList<>();
-    private List<String> opponentDeck = new ArrayList<>();
-    private List<String> playerPlayedCards = new ArrayList<>();
-    private List<String> opponentPlayedCards = new ArrayList<>();
+    private List<Card> playerDeck = new ArrayList<>();
+    private List<Card> opponentDeck = new ArrayList<>();
+    private List<Card> playerPlayedCards = new ArrayList<>();
+    private List<Card> opponentPlayedCards = new ArrayList<>();
 
     private boolean isPlayerTurn = true;
     private boolean isCardPlayed = false; // 한 턴에 카드 제출 여부
@@ -58,9 +56,9 @@ public class GameActivity extends AppCompatActivity {
     private Random random = new Random();
 
     // 난이도 관련 변수 초기화
-    private int[] aiCardPlayDelayRange = {2500, 3500};
-    private int[] aiReactionTimeRange = {1000, 3000};
-    private int aiMistakeProbability = 50;
+    private int[] aiCardPlayDelayRange;
+    private int[] aiReactionTimeRange;
+    private int aiMistakeProbability;
 
     // 뒤로가기 버튼 비활성화
     private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
@@ -99,12 +97,12 @@ public class GameActivity extends AppCompatActivity {
             // 종을 잘못 누른 사람에게 페널티
             if (bellPresserIsPlayer) {
                 if (!playerDeck.isEmpty()) {
-                    String penaltyCard = playerDeck.remove(0);
+                    Card penaltyCard = playerDeck.remove(0);
                     opponentDeck.add(penaltyCard);
                 }
             } else {
                 if (!opponentDeck.isEmpty()) {
-                    String penaltyCard = opponentDeck.remove(0);
+                    Card penaltyCard = opponentDeck.remove(0);
                     playerDeck.add(penaltyCard);
                 }
             }
@@ -119,24 +117,22 @@ public class GameActivity extends AppCompatActivity {
     private void setDifficulty(String difficulty) {
         switch (difficulty.toLowerCase()) {
             case "쉬움":
-                aiCardPlayDelayRange = new int[]{5000, 6000}; // 5~6초 랜덤
-                aiReactionTimeRange = new int[]{1000, 3000}; // 1~3초 랜덤
-                aiMistakeProbability = 50; // 50%
+                aiCardPlayDelayRange = new int[]{2500, 3500}; // 5~6초 랜덤
+                aiReactionTimeRange = new int[]{1500, 2300}; // 1~3초 랜덤
+                aiMistakeProbability = 20; // 20%
                 break;
             case "보통":
                 aiCardPlayDelayRange = new int[]{3000, 5000}; // 3~5초 랜덤
                 aiReactionTimeRange = new int[]{500, 2000}; // 0.5~2초 랜덤
-                aiMistakeProbability = 20; // 20%
+                aiMistakeProbability = 10; // 10%
                 break;
             case "어려움":
                 aiCardPlayDelayRange = new int[]{1000, 4000}; // 1~4초 랜덤
                 aiReactionTimeRange = new int[]{0, 500}; // 0~0.5초 랜덤
-                aiMistakeProbability = 10; // 10%
+                aiMistakeProbability = 3; // 3%
                 break;
         }
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +187,7 @@ public class GameActivity extends AppCompatActivity {
         opponentCardView = findViewById(R.id.opponentCard);
 
         //상대, 플레이어 덱 카드 이미지 초지화
-        playerDeckView = findViewById(R.id.playertDeck);
+        playerDeckView = findViewById(R.id.playerDeck);
         opponentDeckView = findViewById(R.id.oppoentDeck);
 
         gameBell = findViewById(R.id.gameBell);
@@ -208,7 +204,7 @@ public class GameActivity extends AppCompatActivity {
     }
     // 게임 로직 초기화
     private void initializeGame() {
-        List<String> deck = new ArrayList<>();
+        List<Card> deck = new ArrayList<>();
 
         // 카드 생성
         createCards(deck, "딸기");
@@ -232,26 +228,16 @@ public class GameActivity extends AppCompatActivity {
         updateTimerView();
     }
 
-    private void createCards(List<String> deck, String fruit) {
-        // 1개짜리 5장
-        for (int i = 0; i < 5; i++) {
-            deck.add(fruit + "_1");
-        }
-        // 2개짜리 3장
-        for (int i = 0; i < 3; i++) {
-            deck.add(fruit + "_2");
-        }
-        // 3개짜리 3장
-        for (int i = 0; i < 3; i++) {
-            deck.add(fruit + "_3");
-        }
-        // 4개짜리 2장
-        for (int i = 0; i < 2; i++) {
-            deck.add(fruit + "_4");
-        }
-        // 5개짜리 1장
-        deck.add(fruit + "_5");
+
+
+    private void createCards(List<Card> deck, String fruit) {
+        for (int i = 0; i < 5; i++) deck.add(new Card(fruit, 1)); // 1개짜리 5장
+        for (int i = 0; i < 3; i++) deck.add(new Card(fruit, 2)); // 2개짜리 3장
+        for (int i = 0; i < 3; i++) deck.add(new Card(fruit, 3)); // 3개짜리 3장
+        for (int i = 0; i < 2; i++) deck.add(new Card(fruit, 4)); // 4개짜리 2장
+        deck.add(new Card(fruit, 5)); // 5개짜리 1장
     }
+
     private void startGame() {
         startTurnTimer();
     }
@@ -298,7 +284,7 @@ public class GameActivity extends AppCompatActivity {
             gameTimerView.setVisibility(View.VISIBLE);
         }
         else{
-            gameTimerView.setVisibility(View.GONE);
+            gameTimerView.setVisibility(View.INVISIBLE);
         }
         gameTimerView.setText(getString(R.string.timer_text, turnTimeLeft));
     }
@@ -315,13 +301,15 @@ public class GameActivity extends AppCompatActivity {
     private void drawPlayerCard() {
         if (!playerDeck.isEmpty()) {
             // 덱에서 카드 하나 뽑기
-            String card = playerDeck.remove(0);
+            Card card = playerDeck.remove(0);
+
             // 뽑은 카드 저장
             playerPlayedCards.add(card);
             // 낸 카드 수 증가
             playerPlayedCardCount++;
             // 카드 이미지 업데이트
-            playerCardView.setImageResource(getCardImage(card));
+            playerCardView.setImageResource(card.getCardImageResource());
+
             // 카드 수 업데이트
             updateCardCounts();
             isCardPlayed = true;
@@ -343,11 +331,11 @@ public class GameActivity extends AppCompatActivity {
         private void drawOpponentCard() {
         gameHandler.postDelayed(() -> {
             if (!opponentDeck.isEmpty()) {
-                String card = opponentDeck.remove(0); // 덱에서 카드 하나 제거
+                Card card = opponentDeck.remove(0); // 덱에서 카드 하나 제거
                 opponentPlayedCards.add(card); // 제거한 카드를 플레이 카드 리스트에 추가
 
                 opponentPlayedCardCount++; // 상대방 낸 카드 수 증가
-                opponentCardView.setImageResource(getCardImage(card)); // UI 업데이트
+                playerCardView.setImageResource(card.getCardImageResource());
 
                 updateCardCounts(); // 덱과 플레이 카드 수 업데이트
                 isCardPlayed = true; // 카드 제출 상태 업데이트
@@ -366,11 +354,13 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void triggerAIReaction(boolean isRuleMet) {
+        System.out.println("AI Reaction Triggered");
         int reactionTime = getRandomDelay(aiReactionTimeRange);
 
         gameHandler.postDelayed(() -> {
             if (isRuleMet || random.nextInt(100) < aiMistakeProbability) {
                 gameBellPressed(false); // false: AI가 벨 누름
+                System.out.println("AI Pressed");
             }
         }, reactionTime);
     }
@@ -428,36 +418,18 @@ public class GameActivity extends AppCompatActivity {
     private boolean isHalliGalliRuleMet() {
         Map<String, Integer> fruitCounts = new HashMap<>();
 
-        // 현재 플레이된 카드만 검사
-        List<String> currentPlayedCards = new ArrayList<>();
-        if (!playerPlayedCards.isEmpty()) {
-            currentPlayedCards.add(playerPlayedCards.get(playerPlayedCards.size() - 1)); // 플레이어 마지막 카드
-        }
-        if (!opponentPlayedCards.isEmpty()) {
-            currentPlayedCards.add(opponentPlayedCards.get(opponentPlayedCards.size() - 1)); // 상대방 마지막 카드
+        for (Card card : playerPlayedCards) {
+            fruitCounts.put(card.getFruit(), fruitCounts.getOrDefault(card.getFruit(), 0) + card.getCount());
         }
 
-        // 과일 개수 계산
-        for (String card : currentPlayedCards) {
-            String[] parts = card.split("_");
-            if (parts.length == 2) { // "과일_숫자" 형식 확인
-                String fruit = parts[0];
-                int count = Integer.parseInt(parts[1]);
-                fruitCounts.put(fruit, fruitCounts.getOrDefault(fruit, 0) + count);
-            } else {
-                Log.e(TAG, "Invalid card format: " + card);
-            }
+        for (Card card : opponentPlayedCards) {
+            fruitCounts.put(card.getFruit(), fruitCounts.getOrDefault(card.getFruit(), 0) + card.getCount());
         }
 
-        // 같은 과일의 개수가 정확히 5인지 확인
-        for (Map.Entry<String, Integer> entry : fruitCounts.entrySet()) {
-            Log.d(TAG, "Fruit: " + entry.getKey() + ", Count: " + entry.getValue());
-            if (entry.getValue() == 5) {
-                return true; // 할리갈리 조건 충족
-            }
+        for (int count : fruitCounts.values()) {
+            if (count == 5) return true;
         }
-
-        return false; // 조건 미충족
+        return false;
     }
 
     private void resetPlayedCards() {
@@ -474,36 +446,6 @@ public class GameActivity extends AppCompatActivity {
         // 카드 이미지 초기화
         playerCardView.setImageResource(R.drawable.card_deck);
         opponentCardView.setImageResource(R.drawable.card_deck);
-    }
-
-    private int getCardImage(String cardName) {
-        if (cardName.contains("딸기")) {
-            if (cardName.contains("_1")) return R.drawable.strawberry1;
-            if (cardName.contains("_2")) return R.drawable.strawberry2;
-            if (cardName.contains("_3")) return R.drawable.strawberry3;
-            if (cardName.contains("_4")) return R.drawable.strawberry4;
-            if (cardName.contains("_5")) return R.drawable.strawberry5;
-        } else if (cardName.contains("바나나")) {
-            if (cardName.contains("_1")) return R.drawable.banana1;
-            if (cardName.contains("_2")) return R.drawable.banana2;
-            if (cardName.contains("_3")) return R.drawable.banana3;
-            if (cardName.contains("_4")) return R.drawable.banana4;
-            if (cardName.contains("_5")) return R.drawable.banana5;
-        } else if (cardName.contains("라임")) {
-            if (cardName.contains("_1")) return R.drawable.lime1;
-            if (cardName.contains("_2")) return R.drawable.lime2;
-            if (cardName.contains("_3")) return R.drawable.lime3;
-            if (cardName.contains("_4")) return R.drawable.lime4;
-            if (cardName.contains("_5")) return R.drawable.lime5;
-        } else if (cardName.contains("자두")) {
-            if (cardName.contains("_1")) return R.drawable.plum1;
-            if (cardName.contains("_2")) return R.drawable.plum2;
-            if (cardName.contains("_3")) return R.drawable.plum3;
-            if (cardName.contains("_4")) return R.drawable.plum4;
-            if (cardName.contains("_5")) return R.drawable.plum5;
-        }
-
-        return R.drawable.card_deck; // 기본 뒷면 이미지
     }
 
     private void showExitConfirmationDialog() {
@@ -532,7 +474,7 @@ public class GameActivity extends AppCompatActivity {
 
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(turnIndicator, "alpha", 1f, 0f);
         fadeOut.setDuration(500);
-        fadeOut.setStartDelay(1000);
+        fadeOut.setStartDelay(500);
 
         fadeIn.start();
         fadeOut.start();

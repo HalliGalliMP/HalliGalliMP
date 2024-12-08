@@ -129,7 +129,7 @@
     <!-- 플레이어 정보 -->
 
     <ImageView
-        android:id="@+id/playertDeck"
+        android:id="@+id/playerDeck"
         android:layout_width="100dp"
         android:layout_height="150dp"
         android:layout_below="@+id/linearLayout"

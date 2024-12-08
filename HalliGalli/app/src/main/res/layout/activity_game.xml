@@ -18,7 +18,7 @@
             android:id="@+id/opponentName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="상대"
+            android:text="@string/opponent"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#000000" />
@@ -30,7 +30,8 @@
             android:layout_height="wrap_content"
             android:text="Level: 1 | Total Cards: 123"
             android:textSize="14sp"
-            android:textColor="#666666" />
+            android:textColor="#666666"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <!-- 중앙 타이머 -->
@@ -43,7 +44,8 @@
         android:text="00:00"
         android:textSize="40sp"
         android:textStyle="bold"
-        android:textColor="#FF0000" />
+        android:textColor="#FF0000"
+        android:visibility="gone"/>
 
     <!-- 카드와 벨 영역 -->
 
@@ -54,7 +56,7 @@
         android:layout_above="@+id/oppoentDeck"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="62dp"
-        android:text="32"
+
         android:textColor="#848484"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -89,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="32"
+
                 android:textColor="#000000"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -129,7 +131,7 @@
                 android:id="@+id/playerCardCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="32"
+
                 android:textColor="#000000"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -141,7 +143,7 @@
     <!-- 플레이어 정보 -->
 
     <ImageView
-        android:id="@+id/playertDeck"
+        android:id="@+id/playerDeck"
         android:layout_width="100dp"
         android:layout_height="150dp"
         android:layout_below="@+id/linearLayout"
@@ -153,10 +155,10 @@
         android:id="@+id/playerDeckCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/playertDeck"
+        android:layout_below="@+id/playerDeck"
         android:layout_marginTop="5dp"
         android:layout_marginStart="295dp"
-        android:text="32"
+
         android:textColor="#848484"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -175,7 +177,7 @@
             android:id="@+id/playerName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="나"
+            android:text="@string/me"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#000000" />
@@ -187,7 +189,8 @@
             android:layout_height="wrap_content"
             android:text="Level: 1 | Total Cards: 123"
             android:textSize="14sp"
-            android:textColor="#666666" />
+            android:textColor="#666666"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <!-- 로비로 돌아가는 버튼 -->
@@ -199,7 +202,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="10dp"
-        android:text="로비로 돌아가기" />
+        android:text="@string/back_to_lobby" />
 
     <TextView
         android:id="@+id/turnIndicator"

@@ -36,30 +36,22 @@
         android:id="@+id/loopbackTestButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loopback Test"
+        android:text="@string/loopback_test"
         android:layout_marginBottom="16dp" />
 
-    <!-- Loopback Test 결과 -->
-    <TextView
-        android:id="@+id/loopbackResultView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loopback Result"
-        android:textSize="16sp"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone" />
 
     <!-- 게임 시작 버튼 -->
     <Button
         android:id="@+id/SingleGameButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="싱글 모드" />
+        android:text="@string/game_start" />
 
     <Button
         android:id="@+id/MultiGameButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="멀티 모드" />
+        android:text="멀티 모드"
+        android:visibility="gone"/>
 </LinearLayout>
