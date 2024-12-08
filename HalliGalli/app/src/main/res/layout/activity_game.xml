@@ -68,7 +68,7 @@
         android:layout_above="@+id/linearLayout"
         android:layout_marginStart="22dp"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/card_deck"
+        android:src="@drawable/card_deck_grey"
         android:contentDescription="" />
 
     <LinearLayout
