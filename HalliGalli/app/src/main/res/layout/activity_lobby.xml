@@ -10,6 +10,7 @@
     <ImageView
         android:layout_width="380dp"
         android:layout_height="400dp"
+
         android:src="@drawable/halligalli_lobby"
         android:layout_marginBottom="16dp" />
 
@@ -18,7 +19,7 @@
         android:id="@+id/difficultyLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AI 난이도 설정"
+        android:text="@string/level_select"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />

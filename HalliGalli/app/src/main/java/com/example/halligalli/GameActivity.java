@@ -335,7 +335,7 @@ public class GameActivity extends AppCompatActivity {
                 opponentPlayedCards.add(card); // 제거한 카드를 플레이 카드 리스트에 추가
 
                 opponentPlayedCardCount++; // 상대방 낸 카드 수 증가
-                playerCardView.setImageResource(card.getCardImageResource());
+                opponentCardView.setImageResource(card.getCardImageResource());
 
                 updateCardCounts(); // 덱과 플레이 카드 수 업데이트
                 isCardPlayed = true; // 카드 제출 상태 업데이트
