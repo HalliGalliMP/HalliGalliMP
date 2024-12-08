@@ -2,13 +2,9 @@ package com.example.halligalli;
 
 
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,17 +14,11 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 
 
 public class GameActivity extends AppCompatActivity {
-    public static final int TURN_TIME = 3;
-
-    private String mode; // 싱글 or 멀티
     private String difficulty; // 쉬움, 보통, 어려움
     private TextView gameTimerView, playerCardCountView, opponentCardCountView,
             playerDeckCountView, opponentDeckCountView;
@@ -39,19 +29,17 @@ public class GameActivity extends AppCompatActivity {
     private Handler aiReactionHandler = new Handler();
 
 
-    private List<Card> playerDeck = new ArrayList<>();
-    private List<Card> opponentDeck = new ArrayList<>();
-    private List<Card> playerPlayedCards = new ArrayList<>();
-    private List<Card> opponentPlayedCards = new ArrayList<>();
+    private Deck playerPlayedDecks = new Deck();
+    private Deck opponentPlayedDecks = new Deck();
+
+    private Deck playerDeck = new Deck();
+    private Deck opponentDeck = new Deck();
 
     private boolean isPlayerTurn = true;
     private boolean isCardPlayed = false; // 한 턴에 카드 제출 여부
 
     private int playerPlayedCardCount = 0;  // 플레이어가 낸 카드 수
     private int opponentPlayedCardCount = 0;  // 상대방이 낸 카드 수
-
-    private boolean isGameRunning = true;
-
 
     private static final String TAG = "GameActivity";
     private Random random = new Random();
@@ -80,11 +68,11 @@ public class GameActivity extends AppCompatActivity {
 
             // 종을 누른 사람이 모든 낸 카드 가져감
             if (bellPresserIsPlayer) {
-                playerDeck.addAll(playerPlayedCards);
-                playerDeck.addAll(opponentPlayedCards);
+                playerDeck.addAll(playerPlayedDecks.getCards());
+                playerDeck.addAll(opponentPlayedDecks.getCards());
             } else {
-                opponentDeck.addAll(playerPlayedCards);
-                opponentDeck.addAll(opponentPlayedCards);
+                opponentDeck.addAll(playerPlayedDecks.getCards());
+                opponentDeck.addAll(opponentPlayedDecks.getCards());
             }
 
             // 낸 카드 초기화 및 UI 업데이트
@@ -100,13 +88,13 @@ public class GameActivity extends AppCompatActivity {
             // 종을 잘못 누른 사람에게 페널티
             if (bellPresserIsPlayer) {
                 if (!playerDeck.isEmpty()) {
-                    Card penaltyCard = playerDeck.remove(0);
-                    opponentDeck.add(penaltyCard);
+                    Card penaltyCard = playerDeck.drawCard();
+                    opponentDeck.addCard(penaltyCard);
                 }
             } else {
                 if (!opponentDeck.isEmpty()) {
-                    Card penaltyCard = opponentDeck.remove(0);
-                    playerDeck.add(penaltyCard);
+                    Card penaltyCard = opponentDeck.drawCard();
+                    playerDeck.addCard(penaltyCard);
                 }
             }
 
@@ -149,7 +137,6 @@ public class GameActivity extends AppCompatActivity {
 
         // Intent로 전달된 데이터 수신
         Intent intent = getIntent();
-        mode = intent.getStringExtra("MODE");
         difficulty = intent.getStringExtra("DIFFICULTY");
         setDifficulty(difficulty);
 
@@ -209,39 +196,33 @@ public class GameActivity extends AppCompatActivity {
     }
     // 게임 로직 초기화
     private void initializeGame() {
-        List<Card> deck = new ArrayList<>();
+        Deck fullDeck = new Deck();
 
-        // 카드 생성
-        createCards(deck, "딸기");
-        createCards(deck, "바나나");
-        createCards(deck, "라임");
-        createCards(deck, "자두");
+        createCards(fullDeck, "딸기");
+        createCards(fullDeck, "바나나");
+        createCards(fullDeck, "라임");
+        createCards(fullDeck, "자두");
 
-        // 카드 섞기
-        Collections.shuffle(deck);
+        fullDeck.shuffle();
 
-        // 플레이어와 상대방에게 카드 분배
-        for (int i = 0; i < deck.size(); i++) {
-            if (i % 2 == 0) {
-                playerDeck.add(deck.get(i));
-            } else {
-                opponentDeck.add(deck.get(i));
+        while (fullDeck.size() > 0) {
+            playerDeck.addCard(fullDeck.drawCard());
+            if (fullDeck.size() > 0) {
+                opponentDeck.addCard(fullDeck.drawCard());
             }
         }
 
         updateCardCounts();
-//        updateTimerView();
     }
 
 
 
-    private void createCards(List<Card> deck, String fruit) {
-        for (int i = 0; i < 5; i++) deck.add(new Card(fruit, 1)); // 1개짜리 5장
-
-        for (int i = 0; i < 3; i++) deck.add(new Card(fruit, 2)); // 2개짜리 3장
-        for (int i = 0; i < 3; i++) deck.add(new Card(fruit, 3)); // 3개짜리 3장
-        for (int i = 0; i < 2; i++) deck.add(new Card(fruit, 4)); // 4개짜리 2장
-        deck.add(new Card(fruit, 5)); // 5개짜리 1장
+    private void createCards(Deck deck, String fruit) {
+        for (int i = 0; i < 5; i++) deck.addCard(new Card(fruit, 1)); // 1개짜리 5장
+        for (int i = 0; i < 3; i++) deck.addCard(new Card(fruit, 2)); // 2개짜리 3장
+        for (int i = 0; i < 3; i++) deck.addCard(new Card(fruit, 3)); // 3개짜리 3장
+        for (int i = 0; i < 2; i++) deck.addCard(new Card(fruit, 4)); // 4개짜리 2장
+        deck.addCard(new Card(fruit, 5)); // 5개짜리 1장
     }
 
 
@@ -252,10 +233,10 @@ public class GameActivity extends AppCompatActivity {
 
         if (!playerDeck.isEmpty()) {
             // 덱에서 카드 하나 뽑기
-            Card card = playerDeck.remove(0);
+            Card card = playerDeck.drawCard();
 
             // 뽑은 카드 저장
-            playerPlayedCards.add(card);
+            playerPlayedDecks.addCard(card);
             // 낸 카드 수 증가
             playerPlayedCardCount++;
             // 카드 이미지 업데이트
@@ -290,8 +271,8 @@ public class GameActivity extends AppCompatActivity {
         triggerAIReaction(isHalliGalliRuleMet());
         gameHandler.postDelayed(() -> {
             if (!opponentDeck.isEmpty()) {
-                Card card = opponentDeck.remove(0); // 덱에서 카드 하나 제거
-                opponentPlayedCards.add(card); // 제거한 카드를 플레이 카드 리스트에 추가
+                Card card = opponentDeck.drawCard(); // 덱에서 카드 하나 제거
+                opponentPlayedDecks.addCard(card); // 제거한 카드를 플레이 카드 리스트에 추가
 
                 opponentPlayedCardCount++; // 상대방 낸 카드 수 증가
                 opponentCardView.setImageResource(card.getCardImageResource());
@@ -372,14 +353,16 @@ public class GameActivity extends AppCompatActivity {
         playerCardCountView.setText(String.valueOf(playerPlayedCardCount));
         opponentCardCountView.setText(String.valueOf(opponentPlayedCardCount));
     }
+
+
     private boolean isHalliGalliRuleMet() {
-        if (playerPlayedCards.isEmpty() || opponentPlayedCards.isEmpty()) {
+        if (playerPlayedDecks.isEmpty() || opponentPlayedDecks.isEmpty()) {
             return false; // 카드가 없는 경우 false 반환
         }
 
         // 각 플레이어의 마지막 카드 가져오기
-        Card lastPlayerCard = playerPlayedCards.get(playerPlayedCards.size() - 1);
-        Card lastOpponentCard = opponentPlayedCards.get(opponentPlayedCards.size() - 1);
+        Card lastPlayerCard = playerPlayedDecks.getLastCards();
+        Card lastOpponentCard = opponentPlayedDecks.getLastCards();
 
         // 두 카드의 과일이 같을 때 합산 검사
         if (lastPlayerCard.getFruit().equals(lastOpponentCard.getFruit())) {
@@ -398,8 +381,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void resetPlayedCards() {
         // 양쪽 플레이된 카드 초기화
-        playerPlayedCards.clear();
-        opponentPlayedCards.clear();
+        playerPlayedDecks.clearCard();
+        opponentPlayedDecks.clearCard();
 
         // UI에서 플레이된 카드 수 0으로 표시
         playerPlayedCardCount = 0;
@@ -425,31 +408,6 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = new Intent(GameActivity.this, LobbyActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-    }
-
-    private void showTurnTransitionAnimation() {
-        TextView turnIndicator = findViewById(R.id.turnIndicator); // XML에서 추가 필요
-        turnIndicator.setText(isPlayerTurn ? "플레이어의 턴!" : "상대방의 턴!");
-        turnIndicator.setAlpha(0f);
-        turnIndicator.setVisibility(View.VISIBLE);
-
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(turnIndicator, "alpha", 0f, 1f);
-        fadeIn.setDuration(50);
-
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(turnIndicator, "alpha", 1f, 0f);
-        fadeOut.setDuration(50);
-        fadeOut.setStartDelay(300);
-
-        fadeIn.start();
-        fadeOut.start();
-
-        // 애니메이션 종료 후 숨김 처리
-        fadeOut.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                turnIndicator.setVisibility(View.GONE);
-            }
-        });
     }
 
     private void checkForGameEnd() {
