@@ -20,9 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 
@@ -38,6 +36,7 @@ public class GameActivity extends AppCompatActivity {
     private TextView playerNameView;
 
     private Handler gameHandler = new Handler();
+    private Handler aiReactionHandler = new Handler();
     private int turnTimeLeft = 3; // 9초 제한시간
 
     private List<Card> playerDeck = new ArrayList<>();
@@ -52,13 +51,15 @@ public class GameActivity extends AppCompatActivity {
     private int opponentPlayedCardCount = 0;  // 상대방이 낸 카드 수
 
     private boolean isGameRunning = true;
+
+
     private static final String TAG = "GameActivity";
     private Random random = new Random();
 
     // 난이도 관련 변수 초기화
     private int[] aiCardPlayDelayRange;
     private int[] aiReactionTimeRange;
-    private int aiMistakeProbability;
+    private int aiMistakeProbabilityTrue, aiMistakeProbabilityFalse;
 
     // 뒤로가기 버튼 비활성화
     private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
@@ -119,17 +120,20 @@ public class GameActivity extends AppCompatActivity {
             case "쉬움":
                 aiCardPlayDelayRange = new int[]{2500, 3500}; // 5~6초 랜덤
                 aiReactionTimeRange = new int[]{1500, 2300}; // 1~3초 랜덤
-                aiMistakeProbability = 20; // 20%
+                aiMistakeProbabilityTrue = 2;
+                aiMistakeProbabilityFalse = 10; // 20%
                 break;
             case "보통":
                 aiCardPlayDelayRange = new int[]{3000, 5000}; // 3~5초 랜덤
                 aiReactionTimeRange = new int[]{500, 2000}; // 0.5~2초 랜덤
-                aiMistakeProbability = 10; // 10%
+                aiMistakeProbabilityTrue = 1;
+                aiMistakeProbabilityFalse = 5; // 10%
                 break;
             case "어려움":
                 aiCardPlayDelayRange = new int[]{1000, 4000}; // 1~4초 랜덤
                 aiReactionTimeRange = new int[]{0, 500}; // 0~0.5초 랜덤
-                aiMistakeProbability = 3; // 3%
+                aiMistakeProbabilityTrue = 0;
+                aiMistakeProbabilityFalse = 2; // 3%
                 break;
         }
     }
@@ -225,7 +229,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         updateCardCounts();
-        updateTimerView();
+//        updateTimerView();
     }
 
 
@@ -242,52 +246,54 @@ public class GameActivity extends AppCompatActivity {
         startTurnTimer();
     }
 
+
+
     private void startTurnTimer() {
 
         gameHandler.removeCallbacksAndMessages(null);
         turnTimeLeft = TURN_TIME;
         isCardPlayed = false;
-        updateTimerView();
+//        updateTimerView();
 
-        gameHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (turnTimeLeft > 0) {
-                    turnTimeLeft--;
-
-                    updateTimerView();
-
-                    gameHandler.postDelayed(this, 1000); // 1초마다 반복
-                } else {
-                    // 턴 종료 처리
-                    if (!isCardPlayed) {
-                            if (isPlayerTurn) {
-
-                                isPlayerTurn = false;
-                                updateTimerView();
-                                drawPlayerCard();
-
-                        } else {
-                                updateTimerView();
-                            drawOpponentCard();
-                        }
-                    }
-                    endTurn(); // 턴 종료
-                }
-            }
-        }, 1000);
+//        gameHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (turnTimeLeft > 0) {
+//                    turnTimeLeft--;
+//
+//                    updateTimerView();
+//
+//                    gameHandler.postDelayed(this, 1000); // 1초마다 반복
+//                } else {
+//                    // 턴 종료 처리
+//                    if (!isCardPlayed) {
+//                            if (isPlayerTurn) {
+//
+//                                isPlayerTurn = false;
+//                                updateTimerView();
+//                                drawPlayerCard();
+//
+//                        } else {
+//                                updateTimerView();
+//                            drawOpponentCard();
+//                        }
+//                    }
+//                    endTurn(); // 턴 종료
+//                }
+//            }
+//        }, 1000);
     }
 
-    private void updateTimerView() {
-        if(isPlayerTurn)
-        {
-            gameTimerView.setVisibility(View.VISIBLE);
-        }
-        else{
-            gameTimerView.setVisibility(View.INVISIBLE);
-        }
-        gameTimerView.setText(getString(R.string.timer_text, turnTimeLeft));
-    }
+//    private void updateTimerView() {
+//        if(isPlayerTurn)
+//        {
+//            gameTimerView.setVisibility(View.VISIBLE);
+//        }
+//        else{
+//            gameTimerView.setVisibility(View.INVISIBLE);
+//        }
+//        gameTimerView.setText(getString(R.string.timer_text, turnTimeLeft));
+//    }
 
 //    private void triggerBlinkEffect() {
 //        ObjectAnimator animator = ObjectAnimator.ofFloat(gameTimerView, "alpha", 1f, 0f, 1f);
@@ -299,6 +305,8 @@ public class GameActivity extends AppCompatActivity {
 //    }
 
     private void drawPlayerCard() {
+        aiReactionHandler.removeCallbacksAndMessages(null);
+
         if (!playerDeck.isEmpty()) {
             // 덱에서 카드 하나 뽑기
             Card card = playerDeck.remove(0);
@@ -314,10 +322,11 @@ public class GameActivity extends AppCompatActivity {
             updateCardCounts();
             isCardPlayed = true;
 
+
             // "할리갈리" 규칙 즉시 확인
-            if (isHalliGalliRuleMet()) {
-                gameBellPressed(true); // 플레이어의 즉시 "할리갈리" 처리
-            }
+//            if (isHalliGalliRuleMet()) {
+//                gameBellPressed(true); // 플레이어의 즉시 "할리갈리" 처리
+//            }
 
 
 
@@ -329,6 +338,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
         private void drawOpponentCard() {
+        aiReactionHandler.removeCallbacksAndMessages(null);
+        triggerAIReaction(isHalliGalliRuleMet());
         gameHandler.postDelayed(() -> {
             if (!opponentDeck.isEmpty()) {
                 Card card = opponentDeck.remove(0); // 덱에서 카드 하나 제거
@@ -340,10 +351,8 @@ public class GameActivity extends AppCompatActivity {
                 updateCardCounts(); // 덱과 플레이 카드 수 업데이트
                 isCardPlayed = true; // 카드 제출 상태 업데이트
 
-                // 할리갈리 규칙 즉시 확인
-                if (isHalliGalliRuleMet()) {
-                    triggerAIReaction(true); // AI 즉시 "할리갈리" 처리
-                }
+                aiReactionHandler.removeCallbacksAndMessages(null);
+                triggerAIReaction(isHalliGalliRuleMet());
 
                 endTurn();
             } else {
@@ -357,13 +366,22 @@ public class GameActivity extends AppCompatActivity {
         System.out.println("AI Reaction Triggered");
         int reactionTime = getRandomDelay(aiReactionTimeRange);
 
-        gameHandler.postDelayed(() -> {
-            if (isRuleMet || random.nextInt(100) < aiMistakeProbability) {
-                gameBellPressed(false); // false: AI가 벨 누름
-                System.out.println("AI Pressed");
+        aiReactionHandler.postDelayed(() -> {
+            if (isRuleMet) {
+                if (random.nextInt(100) > aiMistakeProbabilityTrue) {
+                    gameBellPressed(false);
+                    System.out.println("AI Pressed (Rule Met)");
+                }
+            } else {
+                // Rule이 만족되지 않은 경우 aiMistakeProbabilityFalse 확률로 벨 누름
+                if (random.nextInt(100) < aiMistakeProbabilityFalse) {
+                    gameBellPressed(false);
+                    System.out.println("AI Pressed (Mistake)");
+                }
             }
         }, reactionTime);
     }
+
 
 
     // 랜덤 시간 계산 함수
@@ -384,13 +402,13 @@ public class GameActivity extends AppCompatActivity {
         // 턴 교체
         if (!playerDeck.isEmpty() && !opponentDeck.isEmpty()) {
             isPlayerTurn = !isPlayerTurn;
-            updateTimerView();
+
         } else if (playerDeck.isEmpty()) {
             isPlayerTurn = false; // 상대방만 카드 낼 수 있음
-            updateTimerView();
+
         } else if (opponentDeck.isEmpty()) {
             isPlayerTurn = true; // 플레이어만 카드 낼 수 있음
-            updateTimerView();
+
         }
 
         isCardPlayed = false; // 카드 제출 상태 초기화
@@ -416,21 +434,28 @@ public class GameActivity extends AppCompatActivity {
         opponentCardCountView.setText(String.valueOf(opponentPlayedCardCount));
     }
     private boolean isHalliGalliRuleMet() {
-        Map<String, Integer> fruitCounts = new HashMap<>();
-
-        for (Card card : playerPlayedCards) {
-            fruitCounts.put(card.getFruit(), fruitCounts.getOrDefault(card.getFruit(), 0) + card.getCount());
+        if (playerPlayedCards.isEmpty() || opponentPlayedCards.isEmpty()) {
+            return false; // 카드가 없는 경우 false 반환
         }
 
-        for (Card card : opponentPlayedCards) {
-            fruitCounts.put(card.getFruit(), fruitCounts.getOrDefault(card.getFruit(), 0) + card.getCount());
+        // 각 플레이어의 마지막 카드 가져오기
+        Card lastPlayerCard = playerPlayedCards.get(playerPlayedCards.size() - 1);
+        Card lastOpponentCard = opponentPlayedCards.get(opponentPlayedCards.size() - 1);
+
+        // 두 카드의 과일이 같을 때 합산 검사
+        if (lastPlayerCard.getFruit().equals(lastOpponentCard.getFruit())) {
+            int totalCount = lastPlayerCard.getCount() + lastOpponentCard.getCount();
+            return totalCount == 5; // 합이 5이면 true 반환
         }
 
-        for (int count : fruitCounts.values()) {
-            if (count == 5) return true;
+        // 마지막 카드들에서 과일 개수 검사
+        if ((lastPlayerCard.getCount() == 5 || lastOpponentCard.getCount() == 5) && (!lastPlayerCard.getFruit().equals(lastOpponentCard.getFruit()))) {
+            return true; // 한 장이라도 과일이 5개면 true 반환
         }
-        return false;
+
+        return false; // 위 조건을 만족하지 않으면 false 반환
     }
+
 
     private void resetPlayedCards() {
         // 양쪽 플레이된 카드 초기화
@@ -470,11 +495,11 @@ public class GameActivity extends AppCompatActivity {
         turnIndicator.setVisibility(View.VISIBLE);
 
         ObjectAnimator fadeIn = ObjectAnimator.ofFloat(turnIndicator, "alpha", 0f, 1f);
-        fadeIn.setDuration(500);
+        fadeIn.setDuration(150);
 
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(turnIndicator, "alpha", 1f, 0f);
-        fadeOut.setDuration(500);
-        fadeOut.setStartDelay(500);
+        fadeOut.setDuration(150);
+        fadeOut.setStartDelay(200);
 
         fadeIn.start();
         fadeOut.start();
