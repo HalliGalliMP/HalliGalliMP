@@ -14,6 +14,7 @@ public class LobbyActivity extends AppCompatActivity {
     private EditText playerNameInput;
     private Spinner difficultySpinner;
     private Button singleGameButton;
+    private Button loopbackTestButton;
 
 
     @Override
@@ -24,6 +25,21 @@ public class LobbyActivity extends AppCompatActivity {
         getUI();
 
         singleGameButton.setOnClickListener(singleGameClickListener);
+        loopbackTestButton.setOnClickListener(v -> {
+            String playerName = "Player 1";
+            // 난이도 값 가져오기
+            String selectedDifficulty = difficultySpinner.getSelectedItem().toString();
+
+
+            // GameActivity로 전환
+            Intent intent = new Intent(LobbyActivity.this, LoopbackActivity.class);
+            intent.putExtra("PLAYER_NAME", playerName); // 플레이어 이름 전달
+            intent.putExtra("MODE", "싱글 모드"); // 모드 정보 전달
+            intent.putExtra("DIFFICULTY", selectedDifficulty); // 난이도 정보 전달
+            startActivity(intent);
+        });
+
+
     }
 
     private void getUI(){
@@ -31,6 +47,8 @@ public class LobbyActivity extends AppCompatActivity {
 
         difficultySpinner = findViewById(R.id.difficultySpinner);
         singleGameButton = findViewById(R.id.SingleGameButton);
+        loopbackTestButton = findViewById(R.id.loopbackTestButton);
+
     }
 
 

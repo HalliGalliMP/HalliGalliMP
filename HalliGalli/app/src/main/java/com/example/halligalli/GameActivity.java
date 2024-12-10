@@ -184,15 +184,13 @@ public class GameActivity extends AppCompatActivity {
 
         gameBell = findViewById(R.id.gameBell);
 
-        playerNameView = findViewById(R.id.playerName);
+
         gameTimerView = findViewById(R.id.gameTimer);
 
         // 이름 정보 가져오기
-        String playerName = getIntent().getStringExtra("PLAYER_NAME");
-        playerNameView.setText(playerName);
+//        String playerName = getIntent().getStringExtra("PLAYER_NAME");
+//        playerNameView.setText(playerName);
 
-        TextView opponentName = findViewById(R.id.opponentName);
-        opponentName.setText("상대");
     }
     // 게임 로직 초기화
     private void initializeGame() {
