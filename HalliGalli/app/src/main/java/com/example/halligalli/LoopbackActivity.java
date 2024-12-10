@@ -44,6 +44,11 @@ public class LoopbackActivity extends AppCompatActivity {
     private static final String TAG = "GameActivity";
     private Random random = new Random();
 
+    private Card playerCard;
+    private Card opponentCard;
+
+    private ImageView playerDeck2, playerCard2, opponentCard2, opponentDeck2;
+
     // 난이도 관련 변수 초기화
     private int[] aiCardPlayDelayRange;
     private int[] aiReactionTimeRange;
@@ -184,6 +189,11 @@ public class LoopbackActivity extends AppCompatActivity {
 
         gameBell = findViewById(R.id.gameBell);
 
+        opponentCard2 = findViewById(R.id.opponentCard2);
+        opponentDeck2 = findViewById(R.id.opponentDeck2);
+        playerCard2 = findViewById(R.id.playerCard2);
+        playerDeck2 = findViewById(R.id.playerDeck2);
+
 
         gameTimerView = findViewById(R.id.gameTimer);
 
@@ -231,18 +241,19 @@ public class LoopbackActivity extends AppCompatActivity {
 
         if (!playerDeck.isEmpty()) {
             // 덱에서 카드 하나 뽑기
-            Card card = playerDeck.drawCard();
+            playerCard = playerDeck.drawCard();
 
             // 뽑은 카드 저장
-            playerPlayedDecks.addCard(card);
+            playerPlayedDecks.addCard(playerCard);
             // 낸 카드 수 증가
             playerPlayedCardCount++;
             // 카드 이미지 업데이트
-            playerCardView.setImageResource(card.getCardImageResource());
+            playerCardView.setImageResource(playerCard.getCardImageResource());
 
             // 카드 수 업데이트
             updateCardCounts();
             isCardPlayed = true;
+            loopbackChanged(playerCard, opponentCard, isPlayerTurn, false);
 
             endTurn(); // 턴 종료
         } else {
@@ -269,16 +280,18 @@ public class LoopbackActivity extends AppCompatActivity {
         triggerAIReaction(isHalliGalliRuleMet());
         gameHandler.postDelayed(() -> {
             if (!opponentDeck.isEmpty()) {
-                Card card = opponentDeck.drawCard(); // 덱에서 카드 하나 제거
-                opponentPlayedDecks.addCard(card); // 제거한 카드를 플레이 카드 리스트에 추가
+                opponentCard = opponentDeck.drawCard(); // 덱에서 카드 하나 제거
+                opponentPlayedDecks.addCard(opponentCard); // 제거한 카드를 플레이 카드 리스트에 추가
 
                 opponentPlayedCardCount++; // 상대방 낸 카드 수 증가
-                opponentCardView.setImageResource(card.getCardImageResource());
+                opponentCardView.setImageResource(opponentCard.getCardImageResource());
 
                 updateCardCounts(); // 덱과 플레이 카드 수 업데이트
                 isCardPlayed = true; // 카드 제출 상태 업데이트
 
                 aiReactionHandler.removeCallbacksAndMessages(null);
+
+                loopbackChanged(playerCard, opponentCard, isPlayerTurn, false);
                 triggerAIReaction(isHalliGalliRuleMet());
 
                 endTurn();
@@ -346,10 +359,10 @@ public class LoopbackActivity extends AppCompatActivity {
 
     private void updateCardCounts() {
         // 플레이어와 상대방의 덱과 낸 카드 수 업데이트
-        playerDeckCountView.setText(String.valueOf(playerDeck.size()));
-        opponentDeckCountView.setText(String.valueOf(opponentDeck.size()));
-        playerCardCountView.setText(String.valueOf(playerPlayedCardCount));
-        opponentCardCountView.setText(String.valueOf(opponentPlayedCardCount));
+//        playerDeckCountView.setText(String.valueOf(playerDeck.size()));
+//        opponentDeckCountView.setText(String.valueOf(opponentDeck.size()));
+//        playerCardCountView.setText(String.valueOf(playerPlayedCardCount));
+//        opponentCardCountView.setText(String.valueOf(opponentPlayedCardCount));
     }
 
 
@@ -391,6 +404,7 @@ public class LoopbackActivity extends AppCompatActivity {
         // 카드 이미지 초기화
         playerCardView.setImageResource(R.drawable.card_deck);
         opponentCardView.setImageResource(R.drawable.card_deck);
+        loopbackChanged(playerCard, opponentCard, isPlayerTurn, true);
     }
 
     private void showExitConfirmationDialog() {
@@ -433,6 +447,41 @@ public class LoopbackActivity extends AppCompatActivity {
         isCardPlayed = false; // 카드 제출 상태 초기화
         aiReactionHandler.removeCallbacksAndMessages(null);
         gameHandler.removeCallbacksAndMessages(null);
+
+
+    }
+
+
+    private void loopbackChanged(Card playerCard, Card opponentCard, Boolean isPlayerTurn, Boolean isReset){
+        if(isReset)
+        {
+            playerCard2.setImageResource(R.drawable.card_deck);
+            opponentCard2.setImageResource(R.drawable.card_deck);
+
+
+        }
+        else
+        {
+            try{
+                playerCard2.setImageResource(opponentCard.getCardImageResource());
+                opponentCard2.setImageResource(playerCard.getCardImageResource());
+
+            }catch (Exception ignored){
+
+            }
+
+        }
+
+        if(isPlayerTurn){
+            playerDeck2.setImageResource(R.drawable.card_deck);
+            opponentDeck2.setImageResource(R.drawable.card_deck_grey);
+        }
+        else{
+            playerDeck2.setImageResource(R.drawable.card_deck_grey);
+            opponentDeck2.setImageResource(R.drawable.card_deck);
+        }
+
+
 
 
     }
